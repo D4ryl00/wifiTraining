@@ -1,0 +1,2 @@
+include ':app', ':printString'
+rootProject.name='Wifi training'

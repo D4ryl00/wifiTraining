@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Wifi training</string>
+    <string name="wifi_on">On</string>
+    <string name="wifi_off">Off</string>
+    <string name="app_log">App log</string>
+    <string name="wifi_settings">Wi-Fi settings</string>
+</resources>

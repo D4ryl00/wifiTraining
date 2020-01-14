@@ -18,8 +18,8 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
 
     WifiReceiver wifiReceiver = new WifiReceiver();
     Handler handler;
-    CustomThreadRunnable customThreadRunnable;
-    Thread thread;
+    CustomThread customThread;
+    Handler customThreadHandler;
     WifiManager wifiManager;
 
     @Override
@@ -48,9 +48,14 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
 
         wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        customThreadRunnable = new CustomThreadRunnable(handler);
-        thread = new Thread(customThreadRunnable, "customThread");
-        thread.start();
+        customThread = new CustomThread(handler);
+        customThread.start();
+        customThreadHandler = new Handler(customThread.getLooper());
+        if (customThreadHandler == null)
+            printLog("error custom handler");
+        Message msg = new Message();
+        msg.obj = "test handler";
+        customThreadHandler.sendMessage(msg);
     }
 
     @Override
@@ -88,12 +93,20 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
         sleep(2000);
         Message msg = new Message();
         msg.obj = "startWifi function finished";
+        Message msg2 = new Message();
+        msg2.obj = "startWifi function finished2";
         handler.sendMessage(msg);
-        //thread.
+        customThreadHandler.sendMessage(msg2);
     }
 
     public void stopWifi(View view) {
         wifiManager.setWifiEnabled(false);
         new Thread(() -> sleep(2000), "wifiOffThread").start();
+        Message msg = new Message();
+        msg.obj = "stopWifi function finished";
+        Message msg2 = new Message();
+        msg2.obj = "stopWifi function finished2";
+        handler.sendMessage(msg);
+        customThreadHandler.sendMessage(msg2);
     }
 }

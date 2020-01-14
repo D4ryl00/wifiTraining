@@ -12,7 +12,7 @@ import static android.net.wifi.WifiManager.WIFI_STATE_ENABLED;
 
 public class WifiReceiver extends BroadcastReceiver {
 
-    private BroadcasterReceiveListencer listener;
+    private BroadcasterReceiveListener listener;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -29,7 +29,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
     }
 
-    public void setListener (BroadcasterReceiveListencer listener){
+    public void setListener (BroadcasterReceiveListener listener){
         this.listener = listener;
     }
 }

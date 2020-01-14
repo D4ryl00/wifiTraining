@@ -1,53 +1,99 @@
 package com.example.wifitraining;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
+import android.content.Context;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.view.View;
 import android.widget.TextView;
-
 import printString.PrintString;
 
-public class MainActivity extends AppCompatActivity implements BroadcasterReceiveListencer {
+public class MainActivity extends AppCompatActivity implements BroadcasterReceiveListener {
 
 
-    WifiReceiver wr = new WifiReceiver();
+    WifiReceiver wifiReceiver = new WifiReceiver();
+    Handler handler;
+    CustomThreadRunnable customThreadRunnable;
+    Thread thread;
+    WifiManager wifiManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Thread.currentThread().setName("mainThread");
+
         // Create IntentFilter for the BroadcasterReceiver
         IntentFilter filter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        this.registerReceiver(wr, filter);
-        wr.setListener(this);
-        appendLogText(PrintString.printString("Hello world"));
-        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE)
-                != PackageManager.PERMISSION_GRANTED)
-        || (ContextCompat.checkSelfPermission(this, Manifest.permission.CHANGE_WIFI_STATE)
-                != PackageManager.PERMISSION_GRANTED)) {
-            appendLogText(PrintString.printString("Wifi permissions denied"));
-        }
+        this.registerReceiver(wifiReceiver, filter);
+        wifiReceiver.setListener(this);
 
+        printLog(PrintString.printString("Hello world"));
+
+        // Set new Handle
+        handler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message inputMessage) {
+                String log = (String) inputMessage.obj;
+                //appendLogText(log);
+                printLog(log);
+            }
+        };
+
+        wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        customThreadRunnable = new CustomThreadRunnable(handler);
+        thread = new Thread(customThreadRunnable, "customThread");
+        thread.start();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.unregisterReceiver(wr);
+        this.unregisterReceiver(wifiReceiver);
     }
 
-     public void appendLogText(String log) {
+    @Override
+    public void onReceive(String log) {
+        printLog(log);
+    }
+
+    public void appendLogText(String log) {
         PrintString.printString(log);
         TextView appLog = findViewById(R.id.appLogTextView);
         appLog.append(log + "\n");
     }
 
-    public void onReceive(String log) {
-        appendLogText(log);
+    private void printLog(String log) {
+        appendLogText("[" + Thread.currentThread().getName() + "] " + log);
+    }
+
+    private void sleep(long time) {
+        try {
+            Thread.sleep(time);
+            printLog("sleep 1500");
+        }
+        catch (InterruptedException e) {
+            printLog("sleep error" + e.toString());
+        }
+    }
+    public void startWifi(View view) {
+        wifiManager.setWifiEnabled(true);
+        sleep(2000);
+        Message msg = new Message();
+        msg.obj = "startWifi function finished";
+        handler.sendMessage(msg);
+        //thread.
+    }
+
+    public void stopWifi(View view) {
+        wifiManager.setWifiEnabled(false);
+        new Thread(() -> sleep(2000), "wifiOffThread").start();
     }
 }

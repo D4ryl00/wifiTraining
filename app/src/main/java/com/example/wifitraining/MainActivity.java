@@ -130,8 +130,11 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
     private void mSleep(long time) {
         String suffix = " [" + Thread.currentThread().getName() + "]";
         try {
+            long startTime = System.currentTimeMillis();
             Thread.sleep(time);
-            sendStringToHandler("- sleep 1500" + suffix,
+            long stopTime = System.currentTimeMillis();
+            sendStringToHandler("- slept " + (stopTime - startTime) + " (expect " + time
+                            + " milliseconds)" + suffix,
                     handler);
         }
         catch (InterruptedException e) {

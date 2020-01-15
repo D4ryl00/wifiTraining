@@ -14,6 +14,12 @@ import android.view.View;
 import android.widget.TextView;
 import printString.PrintString;
 
+/*
+ * MainActivity implements the BroadcasterReceiverListener interface to receive messages from
+ * the wifi Broadcaster on its onReceive function.
+ *
+ * API 29 does not allow apps disable or enable wifi. So this project is on API 28.
+ */
 public class MainActivity extends AppCompatActivity implements BroadcasterReceiveListener {
 
     TextView appLogView;
@@ -103,6 +109,10 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
         }
     }
 
+    /*
+     * This function is called when the wifi ON button is pressed.
+     * It sends message to main and custom Handlers before to switch on wifi
+     */
     public void startWifi(View view) {
         String str = "- startWifi function";
         printLog(str);
@@ -112,15 +122,18 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
         mSleep(2000);
     }
 
+    /*
+     * This function is called when the wifi Off button is pressed.
+     * It sends message to main and custom Handlers before to switch off wifi into its own thread.
+     */
     public void stopWifi(View view) {
         String str = "- stopWifi function";
         printLog(str);
         sendStringToHandler(str, handler);
         sendStringToHandler(str, customThreadHandler);
-        Thread wifiThread = new Thread(
+        new Thread(
                 () -> {wifiManager.setWifiEnabled(false); mSleep(2000); },
                 "wifiOffThread"
-        );
-        wifiThread.start();
+        ).start();
     }
 }

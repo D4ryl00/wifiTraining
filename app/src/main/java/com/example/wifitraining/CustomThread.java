@@ -6,7 +6,9 @@ import android.os.Message;
 
 import printString.PrintString;
 
-
+/*
+* CustomThread extends HandlerThread because it's a helper class that comes with a looper.
+ */
 public class CustomThread extends HandlerThread {
 
     private static Handler mainHandler;

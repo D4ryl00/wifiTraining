@@ -12,20 +12,14 @@ public class CustomThread extends HandlerThread {
     private static Handler mainHandler;
 
     CustomThread(Handler handler) {
-        super("CustomThread");
+        super("customThread");
         mainHandler = handler;
-    }
-
-    @Override
-    protected void onLooperPrepared() {
-        super.onLooperPrepared();
-        sendToMainThread("set up");
     }
 
     public static void sendToMainThread(String string) {
         PrintString.printString(string);
         Message message = new Message();
-        message.obj = "[" + Thread.currentThread().getName() + "] " + string;
+        message.obj = string + " [" + Thread.currentThread().getName() + ": sendToMainThread]" ;
         mainHandler.sendMessage(message);
     }
 }

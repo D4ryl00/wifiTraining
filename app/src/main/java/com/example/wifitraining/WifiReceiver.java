@@ -21,19 +21,19 @@ public class WifiReceiver extends BroadcastReceiver {
         int wifiStatus = intent.getIntExtra(EXTRA_WIFI_STATE, -1);
         switch (wifiStatus) {
             case WIFI_STATE_ENABLED:
-                listener.onReceive("WifiReceiver: wifi on");
+                listener.onReceive("- WifiReceiver: wifi on");
                 break ;
             case WIFI_STATE_ENABLING:
-                listener.onReceive("WifiReceiver: wifi enabling");
+                listener.onReceive("- WifiReceiver: wifi enabling");
                 break ;
             case WIFI_STATE_DISABLED:
-                listener.onReceive("WifiReceiver: wifi off");
+                listener.onReceive("- WifiReceiver: wifi off");
                 break ;
             case WIFI_STATE_DISABLING:
-                listener.onReceive("WifiReceiver: wifi disabling");
+                listener.onReceive("- WifiReceiver: wifi disabling");
                 break ;
             default:
-                listener.onReceive("WifiReceiver state error: unknown");
+                listener.onReceive("- WifiReceiver state error: unknown");
         }
     }
 

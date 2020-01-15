@@ -9,13 +9,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 import printString.PrintString;
 
 public class MainActivity extends AppCompatActivity implements BroadcasterReceiveListener {
 
-
+    TextView appLogView;
     WifiReceiver wifiReceiver = new WifiReceiver();
     Handler handler;
     CustomThread customThread;
@@ -26,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        appLogView = findViewById(R.id.appLogTextView);
+        appLogView.setMovementMethod(new ScrollingMovementMethod());
 
         Thread.currentThread().setName("mainThread");
 
@@ -40,8 +43,8 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message inputMessage) {
+                printLog("mainThreadHandle function");
                 String log = (String) inputMessage.obj;
-                //appendLogText(log);
                 printLog(log);
             }
         };
@@ -50,12 +53,14 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
 
         customThread = new CustomThread(handler);
         customThread.start();
-        customThreadHandler = new Handler(customThread.getLooper());
-        if (customThreadHandler == null)
-            printLog("error custom handler");
-        Message msg = new Message();
-        msg.obj = "test handler";
-        customThreadHandler.sendMessage(msg);
+        customThreadHandler = new Handler(customThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                printLog("CustomThreadHandle function");
+                CustomThread.sendToMainThread((String) msg.obj);
+            }
+        };
     }
 
     @Override
@@ -71,42 +76,49 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
 
     public void appendLogText(String log) {
         PrintString.printString(log);
-        TextView appLog = findViewById(R.id.appLogTextView);
-        appLog.append(log + "\n");
+        appLogView.append(log + "\n");
     }
 
     private void printLog(String log) {
         appendLogText("[" + Thread.currentThread().getName() + "] " + log);
     }
 
-    private void sleep(long time) {
+    private void sendStringToHandler(String str, Handler handler) {
+        Message msg = handler.obtainMessage();
+        msg.obj = str;
+        msg.sendToTarget();
+    }
+
+    private void mSleep(long time) {
+        String prefix = "[" + Thread.currentThread().getName() + "] ";
         try {
             Thread.sleep(time);
-            printLog("sleep 1500");
+            sendStringToHandler(prefix + "sleep 1500",
+                    handler);
         }
         catch (InterruptedException e) {
-            printLog("sleep error" + e.toString());
+            printLog(prefix + "sleep error" + e.toString());
         }
     }
+
     public void startWifi(View view) {
+        String str = "startWifi function";
+        printLog(str);
+        sendStringToHandler(str, handler);
+        sendStringToHandler(str, customThreadHandler);
         wifiManager.setWifiEnabled(true);
-        sleep(2000);
-        Message msg = new Message();
-        msg.obj = "startWifi function finished";
-        Message msg2 = new Message();
-        msg2.obj = "startWifi function finished2";
-        handler.sendMessage(msg);
-        customThreadHandler.sendMessage(msg2);
+        mSleep(2000);
     }
 
     public void stopWifi(View view) {
-        wifiManager.setWifiEnabled(false);
-        new Thread(() -> sleep(2000), "wifiOffThread").start();
-        Message msg = new Message();
-        msg.obj = "stopWifi function finished";
-        Message msg2 = new Message();
-        msg2.obj = "stopWifi function finished2";
-        handler.sendMessage(msg);
-        customThreadHandler.sendMessage(msg2);
+        String str = "stopWifi function";
+        printLog(str);
+        sendStringToHandler(str, handler);
+        sendStringToHandler(str, customThreadHandler);
+        Thread wifiThread = new Thread(
+                () -> {wifiManager.setWifiEnabled(false); mSleep(2000); },
+                "wifiOffThread"
+        );
+        wifiThread.start();
     }
 }

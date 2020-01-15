@@ -8,7 +8,9 @@ import printString.PrintString;
 
 import static android.net.wifi.WifiManager.EXTRA_WIFI_STATE;
 import static android.net.wifi.WifiManager.WIFI_STATE_DISABLED;
+import static android.net.wifi.WifiManager.WIFI_STATE_DISABLING;
 import static android.net.wifi.WifiManager.WIFI_STATE_ENABLED;
+import static android.net.wifi.WifiManager.WIFI_STATE_ENABLING;
 
 public class WifiReceiver extends BroadcastReceiver {
 
@@ -21,11 +23,17 @@ public class WifiReceiver extends BroadcastReceiver {
             case WIFI_STATE_ENABLED:
                 listener.onReceive("WifiReceiver: wifi on");
                 break ;
+            case WIFI_STATE_ENABLING:
+                listener.onReceive("WifiReceiver: wifi enabling");
+                break ;
             case WIFI_STATE_DISABLED:
                 listener.onReceive("WifiReceiver: wifi off");
                 break ;
+            case WIFI_STATE_DISABLING:
+                listener.onReceive("WifiReceiver: wifi disabling");
+                break ;
             default:
-                PrintString.printString("WifiReceiver error: failed to get extra");
+                listener.onReceive("WifiReceiver state error: unknown");
         }
     }
 

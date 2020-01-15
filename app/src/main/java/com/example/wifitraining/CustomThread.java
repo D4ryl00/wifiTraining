@@ -4,6 +4,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 
+import printString.PrintString;
+
 
 public class CustomThread extends HandlerThread {
 
@@ -14,13 +16,6 @@ public class CustomThread extends HandlerThread {
         mainHandler = handler;
     }
 
-    private static class MyHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            sendToMainThread((String) msg.obj);
-        }
-    }
-
     @Override
     protected void onLooperPrepared() {
         super.onLooperPrepared();
@@ -28,6 +23,7 @@ public class CustomThread extends HandlerThread {
     }
 
     public static void sendToMainThread(String string) {
+        PrintString.printString(string);
         Message message = new Message();
         message.obj = "[" + Thread.currentThread().getName() + "] " + string;
         mainHandler.sendMessage(message);

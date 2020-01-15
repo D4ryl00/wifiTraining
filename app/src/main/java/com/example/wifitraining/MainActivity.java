@@ -12,6 +12,8 @@ import android.os.Message;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.TextView;
+
+// This is the GoLang function that only prints its argument and returns it.
 import printString.PrintString;
 
 /*
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
         appLogView = findViewById(R.id.appLogTextView);
         appLogView.setMovementMethod(new ScrollingMovementMethod());
 
+        // The printString GoLang lib returns the string too
         printLog(PrintString.printString("Hello world"));
 
         Thread.currentThread().setName("mainThread");
@@ -82,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
         printLog(log);
     }
 
+    /*
+     * Print with the GoLang lib and print to the log view.
+     */
     private void appendLogText(String log) {
         PrintString.printString(log);
         appLogView.append(log + "\n");

@@ -74,6 +74,30 @@ public class MainActivity extends AppCompatActivity implements BroadcasterReceiv
         };
     }
 
+    /*
+     * On foreground
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String str = "- onResume function";
+        printLog(str);
+        sendStringToHandler(str, handler);
+        sendStringToHandler(str, customThreadHandler);
+    }
+
+    /*
+     * On background
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        String str = "- onPause function";
+        printLog(str);
+        sendStringToHandler(str, handler);
+        sendStringToHandler(str, customThreadHandler);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
